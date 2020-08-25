@@ -26,7 +26,7 @@ export default function Login() {
   return (
     <form onSubmit={(e) => handleSubmit(e)}>
       <div className={classes.container}>
-        <Typography>User Login</Typography>
+        <Typography variant="h6">User Login</Typography>
         <TextField
           className={classes.textField}
           id="outlined-email-input"

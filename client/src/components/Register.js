@@ -30,11 +30,15 @@ export default function Register() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [username, setUsername] = useState("");
-  console.log(email, password, username);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+  };
+
   return (
-    <form>
+    <form onSubmit={(e) => handleSubmit(e)}>
       <div className={classes.container}>
-        <Typography>User Registration</Typography>
+        <Typography variant="h6">User Registration</Typography>
         <TextField
           className={classes.textField}
           id="outlined-email-input"
