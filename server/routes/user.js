@@ -4,11 +4,17 @@ const User = require("../models/user");
 const jwt = require("jsonwebtoken");
 const route = express.Router();
 
-route.get("/", (req, res) => {
-  res.json({
-    message: "user get route",
+route.get("/", verifyToken, (req, res) => {
+    jwt.verify(req.token, "secretkey", (err, authData) => {
+      if (err) {
+        res.sendStatus(403);
+      } else {
+        res.json({
+          authData,
+        });
+      }
+    });
   });
-});
 
 route.post("/login", async (req, res) => {
   const { email, password } = req.body;
