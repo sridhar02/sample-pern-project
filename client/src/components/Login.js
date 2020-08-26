@@ -68,7 +68,7 @@ export default function Login() {
   return (
     <form onSubmit={(e) => handleSubmit(e)}>
       <div className={classes.container}>
-        <img src={login} style={{ width: "500px" }} className={classes.image} />
+        <img src={login} style={{ width: "500px" }} className={classes.image} alt="login logo"/>
         <div className={classes.main}>
           <Typography variant="h6">User Login</Typography>
           <TextField

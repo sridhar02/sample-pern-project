@@ -13,6 +13,10 @@ const useNavbarStyles = makeStyles((theme) => ({
     color: "white",
     fontSize: "20px",
   },
+  button:{
+    padding:"0px",
+    color:"#fff"
+  }
 }));
 
 export default function Navbar() {
@@ -37,9 +41,9 @@ export default function Navbar() {
         <a className={classes.link} href="/profile">
           Dashboard
         </a>
-        <button className={classes.link} onClick={handleLogout}>
+        <Button className={classes.button} onClick={handleLogout}>
           logout
-        </button>
+        </Button>
       </div>
     </AppBar>
   );
