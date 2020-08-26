@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import axios from "axios";
+import { Link, useHistory } from "react-router-dom";
 import { makeStyles, TextField, Typography, Button } from "@material-ui/core";
 
 const useRegisterStyles = makeStyles((theme) => ({
@@ -23,26 +24,47 @@ const useRegisterStyles = makeStyles((theme) => ({
     textDecoration: "none",
     color: "white",
   },
-  main:{
-    border:"1px solid #eee",
+  main: {
+    border: "1px solid #eee",
     display: "flex",
     flexDirection: "column",
     justifyContent: "center",
     alignItems: "center",
-    padding:"30px",
-    borderRadius:"10px",
-    background:"#fff"
-  }
+    padding: "30px",
+    borderRadius: "10px",
+    background: "#fff",
+  },
 }));
 
 export default function Register() {
   const classes = useRegisterStyles();
+  const history = useHistory();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [username, setUsername] = useState("");
+  const [authToken] = useState(localStorage.getItem("token"));
 
-  const handleSubmit = (e) => {
+  if (authToken) {
+    history.push("/profile");
+  }
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    try {
+      const response = await axios.post(
+        `${process.env.REACT_APP_BACKEND_API}/register`,
+        {
+          email,
+          username,
+          password,
+        }
+      );
+      if (response.status === 200) {
+        history.push("/login");
+      }
+    } catch (error) {
+      alert(error);
+    }
   };
 
   return (

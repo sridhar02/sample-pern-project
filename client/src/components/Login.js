@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+import axios from "axios";
+import { useHistory } from "react-router-dom";
 import { makeStyles, TextField, Typography, Button } from "@material-ui/core";
 
 const useLoginStyles = makeStyles((theme) => ({
@@ -29,11 +31,33 @@ const useLoginStyles = makeStyles((theme) => ({
 
 export default function Login() {
   const classes = useLoginStyles();
+  const history = useHistory();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleSubmit = (e) => {
+  const [authToken] = useState(localStorage.getItem("token"));
+
+  if (authToken) {
+    history.push("/profile");
+  }
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    try {
+      const response = await axios.post(
+        `${process.env.REACT_APP_BACKEND_API}/login`,
+        {
+          email,
+          password,
+        }
+      );
+      if (response.status === 200) {
+        localStorage.setItem("token", response.data.token);
+        history.push("/profile");
+      }
+    } catch (error) {
+      alert(error);
+    }
   };
 
   return (
