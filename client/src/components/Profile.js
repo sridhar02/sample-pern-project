@@ -4,6 +4,7 @@ import { Redirect } from "react-router-dom";
 import { Typography } from "@material-ui/core";
 
 import Navbar from "./Navbar";
+import Footer from "./Footer";
 
 function UserProfileDetails({ user }) {
   return (
@@ -57,6 +58,7 @@ export default function Profile() {
       {!isLoggedIn && <Redirect to="/login" />}
       <Navbar />
       {user && <UserProfileDetails user={user.user} />}
+      <Footer />
     </>
   );
 }
