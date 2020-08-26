@@ -3,32 +3,39 @@ const { Router } = require("express");
 const User = require("../models/user");
 const jwt = require("jsonwebtoken");
 const route = express.Router();
+const bcrypt = require("bcrypt");
+const saltRounds = 10;
 
 route.get("/", verifyToken, (req, res) => {
-    jwt.verify(req.token, "secretkey", (err, authData) => {
-      if (err) {
-        res.sendStatus(403);
-      } else {
-        res.json({
-          authData,
-        });
-      }
-    });
+  jwt.verify(req.token, "secretkey", (err, authData) => {
+    if (err) {
+      res.sendStatus(403);
+    } else {
+      res.json({
+        authData,
+      });
+    }
   });
+});
 
 route.post("/login", async (req, res) => {
   const { email, password } = req.body;
   try {
     const user = await User.findOne({ where: { email } });
-    if (user.password !== password) {
-      res
-        .status(404)
-        .json({ message: "user not found with the entered password" });
-    } else {
-      jwt.sign({ user }, "secretkey", { expiresIn: "3000s" }, (err, token) => {
-        res.json({ message: "user succesfully created ", token });
-      });
-    }
+    bcrypt.compare(password, user.password, (err, result) => {
+      result
+        ? jwt.sign(
+            { user },
+            "secretkey",
+            { expiresIn: "3000s" },
+            (err, token) => {
+              res.json({ message: "user succesfully created ", token });
+            }
+          )
+        : res
+            .status(404)
+            .json({ message: "user not found with the entered password" });
+    });
   } catch (err) {
     res.json({ error: err });
   }
@@ -45,16 +52,18 @@ route.post("/register", (req, res) => {
   if (!password) {
     console.log("can not be empty");
   }
-
-  User.create({ email, username, password })
-    .then((user) => {
-      res.json({ message: "user succesfully created ", user });
-    })
-    .catch((err) => res.render("error", { error: err.message }));
+  bcrypt.hash(password, saltRounds, function (err, hash) {
+    console.log(hash, password);
+    User.create({ email, username, password: hash })
+      .then((user) => {
+        res.json({ message: "user succesfully created ", user });
+      })
+      .catch((err) => res.status(404).json({ error: err }));
+  });
 });
 
 route.post("/api/posts", verifyToken, (req, res) => {
-  jwt.verify(req.token, "secretkey", (err, authData) => {
+  jwt.verify(req.token, process.env.JWT_KEY, (err, authData) => {
     if (err) {
       res.sendStatus(403);
     } else {
