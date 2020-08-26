@@ -38,9 +38,6 @@ export default function Navbar() {
         <a className={classes.link} href="/profile">
           Profile
         </a>
-        <a className={classes.link} href="/profile">
-          Dashboard
-        </a>
         <Button className={classes.button} onClick={handleLogout}>
           logout
         </Button>

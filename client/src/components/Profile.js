@@ -1,13 +1,24 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { useHistory, Redirect } from "react-router-dom";
+import { Redirect } from "react-router-dom";
 import { Typography } from "@material-ui/core";
 
 import Navbar from "./Navbar";
 
+function UserProfileDetails({ user }) {
+  return (
+    <div style={{ padding: "20px" }}>
+      <Typography variant="h6" style={{ marginTop: "70px" }}>
+        Profile Page
+      </Typography>
+      <Typography variant="body2">Email: {user.email}</Typography>
+      <Typography variant="body2">User Name: {user.username}</Typography>
+    </div>
+  );
+}
+
 export default function Profile() {
   const [user, setUser] = useState("");
-  const history = useHistory();
   const [isLoggedIn] = useState(() => {
     if (
       localStorage.getItem("token") &&
@@ -45,10 +56,7 @@ export default function Profile() {
     <>
       {!isLoggedIn && <Redirect to="/login" />}
       <Navbar />
-      <Typography variant="h6" style={{ marginTop: "70px" }}>
-        Profile Page
-      </Typography>
-      {JSON.stringify( user && user.user.email)}
+      {user && <UserProfileDetails user={user.user} />}
     </>
   );
 }
