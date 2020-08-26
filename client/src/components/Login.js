@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
+import login from "./login.svg";
 import { useHistory } from "react-router-dom";
 import { makeStyles, TextField, Typography, Button } from "@material-ui/core";
 
@@ -7,7 +8,6 @@ const useLoginStyles = makeStyles((theme) => ({
   container: {
     height: "100vh",
     display: "flex",
-    flexDirection: "column",
     justifyContent: "center",
     alignItems: "center",
     // background:"#a9d9cd",
@@ -26,6 +26,11 @@ const useLoginStyles = makeStyles((theme) => ({
     padding: "20px",
     borderRadius: "10px",
     background: "#fff",
+  },
+  image: {
+    [theme.breakpoints.down("md")]: {
+      display: "none",
+    },
   },
 }));
 
@@ -63,6 +68,7 @@ export default function Login() {
   return (
     <form onSubmit={(e) => handleSubmit(e)}>
       <div className={classes.container}>
+        <img src={login} style={{ width: "500px" }} className={classes.image} />
         <div className={classes.main}>
           <Typography variant="h6">User Login</Typography>
           <TextField
