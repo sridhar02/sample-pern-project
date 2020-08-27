@@ -8,38 +8,29 @@ const saltRounds = 10;
 const axios = require("axios");
 const queryString = require("query-string");
 
-function getLinkedInAuthorizationCode(codeLinkedIN) {
-  const params = {
-    grant_type: "authorization_code",
-    code: codeLinkedIN,
-    redirect_uri: "http://localhost:3000/profile",
-    client_id: process.env.EXPRESS_APP_CLIENT_ID,
-    client_secret: process.env.EXPRESS_APP_CLIENT_SECRET,
-  };
-  const query = queryString.stringify(params);
-  return axios.get(`https://www.linkedin.com/oauth/v2/accessToken?${query}`);
-}
-
-function getUserData(accessToken) {
-  return axios.get(`https://api.linkedin.com/v2/me`, {
-    headers: {
-      authorization: `Bearer ${accessToken}`,
-    },
-  });
-}
-
-route.get("/", verifyToken, (req, res) => {
-  jwt.verify(req.token, "secretkey", (err, authData) => {
-    if (err) {
-      res.sendStatus(403);
-    } else {
-      res.json({
-        authData,
-      });
-    }
+// user registration end point
+route.post("/register", (req, res) => {
+  const { email, username, password } = req.body;
+  if (!username) {
+    console.log("can not be empty");
+  }
+  if (!email) {
+    console.log("can not be empty");
+  }
+  if (!password) {
+    console.log("can not be empty");
+  }
+  bcrypt.hash(password, saltRounds, function (err, hash) {
+    console.log(hash, password);
+    User.create({ email, username, password: hash })
+      .then((user) => {
+        res.json({ message: "user succesfully created ", user });
+      })
+      .catch((err) => res.status(404).json({ error: err }));
   });
 });
 
+// user login end point
 route.post("/login", async (req, res) => {
   const { email, password } = req.body;
   try {
@@ -63,27 +54,20 @@ route.post("/login", async (req, res) => {
   }
 });
 
-route.post("/register", (req, res) => {
-  const { email, username, password } = req.body;
-  if (!username) {
-    console.log("can not be empty");
-  }
-  if (!email) {
-    console.log("can not be empty");
-  }
-  if (!password) {
-    console.log("can not be empty");
-  }
-  bcrypt.hash(password, saltRounds, function (err, hash) {
-    console.log(hash, password);
-    User.create({ email, username, password: hash })
-      .then((user) => {
-        res.json({ message: "user succesfully created ", user });
-      })
-      .catch((err) => res.status(404).json({ error: err }));
+//Get User details end point
+route.get("/", verifyToken, (req, res) => {
+  jwt.verify(req.token, "secretkey", (err, authData) => {
+    if (err) {
+      res.sendStatus(403);
+    } else {
+      res.json({
+        authData,
+      });
+    }
   });
 });
 
+//LinkedIn oAuth end point to serve Data to the client
 route.get("/linkedInOauth/:code", verifyToken, (req, res) => {
   const { code } = req.params;
   jwt.verify(req.token, process.env.JWT_KEY, (err, authData) => {
@@ -97,16 +81,13 @@ route.get("/linkedInOauth/:code", verifyToken, (req, res) => {
               .then((response) => res.json(response.data))
               .catch((err) => res.sendStatus(404));
           }
-          // res.json({
-          //   authData,
-          //   response: response.data.access_token,
-          // });
         })
         .catch((err) => console.log(err));
     }
   });
 });
 
+//Helper functions for the Api's
 function verifyToken(req, res, next) {
   // Get auth header value
   const bearerHeader = req.headers["authorization"];
@@ -126,12 +107,24 @@ function verifyToken(req, res, next) {
   }
 }
 
-module.exports = route;
+function getLinkedInAuthorizationCode(codeLinkedIN) {
+  const params = {
+    grant_type: "authorization_code",
+    code: codeLinkedIN,
+    redirect_uri: "http://localhost:3000/profile",
+    client_id: process.env.EXPRESS_APP_CLIENT_ID,
+    client_secret: process.env.EXPRESS_APP_CLIENT_SECRET,
+  };
+  const query = queryString.stringify(params);
+  return axios.get(`https://www.linkedin.com/oauth/v2/accessToken?${query}`);
+}
 
-//   User.create({ email, username, password })
-//     .then((user) => {
-//       jwt.sign({ user }, "secretkey", { expiresIn: "30s" }, (err, token) => {
-//         res.json({ message: "user succesfully created ", token });
-//       });
-//     })
-//     .catch((err) => res.render("error", { error: err.message }));
+function getUserData(accessToken) {
+  return axios.get(`https://api.linkedin.com/v2/me`, {
+    headers: {
+      authorization: `Bearer ${accessToken}`,
+    },
+  });
+}
+
+module.exports = route;
