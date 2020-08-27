@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import queryString from "query-string";
-import { Redirect, useParams, useLocation } from "react-router-dom";
+import Divider from "@material-ui/core/Divider";
+import { Redirect, useLocation } from "react-router-dom";
 import { Typography, makeStyles, Button } from "@material-ui/core";
 
 import Navbar from "./Navbar";
@@ -14,16 +15,14 @@ const useUserProfileStyles = makeStyles((theme) => ({
     display: "flex",
     flexDirection: "column",
     justifyContent: "center",
-    // alignItems: "center",
   },
   main: {
     padding: "20px",
     display: "flex",
     flexDirection: "column",
     justifyContent: "center",
-    // alignItems: "center",
     border: "1px solid black",
-    maxWidth: "350px",
+    maxWidth: "100%",
   },
   button: {
     marginTop: "35px",
@@ -33,8 +32,8 @@ const useUserProfileStyles = makeStyles((theme) => ({
 
 function UserProfileDetails({ user }) {
   const classes = useUserProfileStyles();
-  let { code } = useParams();
-  let { search } = useLocation();
+  let location = useLocation();
+  const [userData, setUserData] = useState("");
 
   const LinkedIn = {
     response_type: "code",
@@ -44,32 +43,52 @@ function UserProfileDetails({ user }) {
     scope: `r_liteprofile `,
   };
 
-  const linkedIncode = search.slice(6);
-  
-  const requestSever = () =>{
+  const linkedIncode = new URLSearchParams(location.search).get("code");
 
-  }
+  const requestSever = async () => {
+    const authToken = localStorage.getItem("token");
+    try {
+      const response = await axios.get(
+        `${process.env.REACT_APP_BACKEND_API}/linkedInOauth/${linkedIncode}`,
+        {
+          headers: {
+            authorization: `Bearer ${authToken}`,
+          },
+        }
+      );
+      if (response.status === 200) {
+        setUserData(response.data);
+        console.log(response.data);
+      }
+    } catch (error) {
+      alert(error);
+    }
+  };
 
-  // const profileURL = `https://www.linkedin.com/oauth/v2/authorization?response_type=code&state=987654321&scope=r_liteprofile&client_id={}&redirect_uri={};
   const profileURL = queryString.stringify(LinkedIn);
   const authURL = `https://www.linkedin.com/oauth/v2/authorization/?${profileURL}`;
+
+  useEffect(() => {
+    linkedIncode !== null && requestSever();
+  }, [])
 
   return (
     <div className={classes.container}>
       <Typography variant="h6">Profile Page</Typography>
       <div className={classes.main}>
         <Typography variant="body2">Email: {user.email}</Typography>
+        <Divider />
         <Typography variant="body2">User Name: {user.username}</Typography>
-        {/* <a href="#asdas">Sync With LinkedIn</a> */}
-        <a href={authURL} target="_blank" rel="noopener noreferrer">
-          LinkedIn
-        </a>
+        <Divider />
+        <a href={authURL}>LinkedIn</a>
+        <Divider />
+        <p>{JSON.stringify(userData)}</p>
       </div>
     </div>
   );
 }
 
-export default function Profile() {
+function Profile() {
   const [user, setUser] = useState("");
   const [isLoggedIn] = useState(() => {
     if (
@@ -113,3 +132,5 @@ export default function Profile() {
     </>
   );
 }
+
+export default Profile;
