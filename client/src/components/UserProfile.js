@@ -6,20 +6,19 @@ import { Card, Typography, Button, makeStyles } from "@material-ui/core";
 
 function Head() {
   return (
-    <Card style={{ margin: "20px 0px" }}>
-      <img
+    <Card style={{ margin: "20px 0px", padding: "20px" }}>
+      {/* <img
         style={{ borderRadius: "8px", textAlign: "center" }}
         width="150px"
         height="100px"
         src="https://www.pngitem.com/pimgs/m/146-1468479_my-profile-icon-blank-profile-picture-circle-hd.png"
         alt="asdasd"
-      />
-      <div>
-        <Typography variant="body1"> Name: Sridhar Katta</Typography>
-        <Typography variant="body1">Email: test@gmail.com</Typography>
-        {/* <Typography variant="body1">Name:</Typography> */}
-        {/* <Typography variant="body1">Name:</Typography> */}
-      </div>
+      /> */}
+      <Typography variant="h6">Basic Profile:</Typography>
+      <Typography variant="body1"> Name: Sridhar Katta</Typography>
+      <Typography variant="body1">Email: test@gmail.com</Typography>
+      <Typography variant="body1">Phonenumber: +91-95507546544</Typography>
+      <Typography variant="body1">City: Hyderabad</Typography>
     </Card>
   );
 }
@@ -88,7 +87,7 @@ function Skills() {
 //   );
 // }
 const useUserProfileStyles = makeStyles((theme) => ({
-  container: {
+  container1: {
     display: "flex",
     flexDirection: "column",
     background: "#f5f5f5",
@@ -103,12 +102,24 @@ const useUserProfileStyles = makeStyles((theme) => ({
     justifyContent: "center",
     maxWidth: "100%",
   },
+  link: {
+    color: "#fff",
+    textDecoration: "none",
+  },
+  button: {
+    maxWidth: "500px",
+  },
+  container2: {
+    display: "flex",
+    justifyContent: "space-around",
+  },
 }));
 
 function UserProfile() {
   let location = useLocation();
   const classes = useUserProfileStyles();
   const [userData, setUserData] = useState("");
+  const [showProfile, setShowProfile] = useState(false);
   const linkedIncode = new URLSearchParams(location.search).get("code");
   const history = useHistory();
 
@@ -135,6 +146,7 @@ function UserProfile() {
       );
       if (response.status === 200) {
         setUserData(response.data);
+        setShowProfile(true);
       }
     } catch (error) {
       alert(error);
@@ -143,22 +155,34 @@ function UserProfile() {
 
   useEffect(() => {
     linkedIncode !== null && requestSever();
-    history.push('/profile');
+    history.push("/profile");
   }, [linkedIncode]);
 
   console.log(userData);
-  
+
   return (
-    <div className={classes.container}>
-      <Typography variant="h6">Profile Page</Typography>
-      <Button variant="contained">
-        <a href={authURL}>LinkedIn</a>
-      </Button>
-      <Head />
-      <About />
-      <Education />
-      <Experience />
-      <Skills />
+    <div className={classes.container1}>
+      <div className={classes.container2}>
+        <Typography variant="h6">Profile Page</Typography>
+        <Button variant="contained" color="primary" className={classes.button}>
+          <a href={authURL} className={classes.link}>
+            Sync with LinkedIn
+          </a>
+        </Button>
+      </div>
+      {showProfile && (
+        <div
+          style={{
+            margin:"0px 50vh"
+          }}
+        >
+          <Head />
+          <About />
+          <Education />
+          <Experience />
+          <Skills />
+        </div>
+      )}
     </div>
   );
 }
