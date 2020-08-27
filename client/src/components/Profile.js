@@ -118,7 +118,7 @@ function Profile() {
         }
       );
       if (response.status === 200) {
-        setUser(response.data.authData);
+        setUser(response.data);
       }
     } catch (error) {
       alert(error);
