@@ -6,7 +6,7 @@ const useFooterStyles = makeStyles((theme) => ({
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
-    marginTop: "75vh",
+    marginTop: "73vh",
     backgroundColor: "#3f51b5",
     color: "#fff",
   },

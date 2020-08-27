@@ -11,6 +11,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "axios": "^0.20.0",
     "bcrypt": "^5.0.0",
     "cors": "^2.8.5",
     "dotenv": "^8.2.0",
@@ -20,6 +21,7 @@
     "nodemon": "^2.0.4",
     "pg": "^8.3.2",
     "pg-hstore": "^2.3.3",
+    "query-string": "^6.13.1",
     "sequelize": "^6.3.4"
   }
 }
