@@ -7,21 +7,27 @@ const bcrypt = require("bcrypt");
 const saltRounds = 10;
 const axios = require("axios");
 const queryString = require("query-string");
+const util = require("util");
+
+const verifyAsync = util.promisify(jwt.verify);
 
 // user registration end point
 route.post("/register", (req, res) => {
   const { email, username, password } = req.body;
   if (!username) {
+    //change required
     console.log("can not be empty");
   }
   if (!email) {
+    //change required
     console.log("can not be empty");
   }
   if (!password) {
+    //change required
     console.log("can not be empty");
   }
+
   bcrypt.hash(password, saltRounds, function (err, hash) {
-    console.log(hash, password);
     User.create({ email, username, password: hash })
       .then((user) => {
         res.json({ message: "user succesfully created ", user });
@@ -56,39 +62,29 @@ route.post("/login", async (req, res) => {
 
 //Get User details end point
 route.get("/", verifyToken, (req, res) => {
-  jwt.verify(req.token, "secretkey", (err, authData) => {
-    if (err) {
-      res.sendStatus(403);
-    } else {
-      res.json({
-        authData,
-      });
-    }
-  });
+  res.json(req.authData.user);
 });
 
 //LinkedIn oAuth end point to serve Data to the client
-route.get("/linkedInOauth/:code", verifyToken, (req, res) => {
+route.get("/linkedInOauth/:code", verifyToken, async (req, res) => {
   const { code } = req.params;
-  jwt.verify(req.token, process.env.JWT_KEY, (err, authData) => {
-    if (err) {
-      res.sendStatus(403);
-    } else {
-      getLinkedInAuthorizationCode(code)
-        .then((response) => {
-          if (response.status === 200) {
-            getUserData(response.data.access_token)
-              .then((response) => res.json(response.data))
-              .catch((err) => res.sendStatus(404));
-          }
-        })
-        .catch((err) => console.log(err));
+  try {
+    const response = await getLinkedInAuthorizationCode(code);
+    if (response.status === 200) {
+      const response = getLinkedInUserData(response.data.access_token);
+      if (response.status === 200) {
+        res.json(response.data);
+        return;
+      }
     }
-  });
+    throw new Error();
+  } catch (error) {
+    res.sendStatus(403);
+  }
 });
 
 //Helper functions for the Api's
-function verifyToken(req, res, next) {
+async function verifyToken(req, res, next) {
   // Get auth header value
   const bearerHeader = req.headers["authorization"];
   // Check if bearer is undefined
@@ -99,8 +95,14 @@ function verifyToken(req, res, next) {
     const bearerToken = bearer[1];
     // Set the token
     req.token = bearerToken;
-    // Next middleware
-    next();
+    try {
+      const authData = await verifyAsync(req.token, process.env.JWT_KEY);
+      req.authData = authData;
+      // Next middleware
+      next();
+    } catch (error) {
+      res.sendStatus(401);
+    }
   } else {
     // Forbidden
     res.sendStatus(403);
@@ -119,7 +121,7 @@ function getLinkedInAuthorizationCode(codeLinkedIN) {
   return axios.get(`https://www.linkedin.com/oauth/v2/accessToken?${query}`);
 }
 
-function getUserData(accessToken) {
+function getLinkedInUserData(accessToken) {
   return axios.get(`https://api.linkedin.com/v2/me`, {
     headers: {
       authorization: `Bearer ${accessToken}`,
