@@ -5,6 +5,28 @@ const jwt = require("jsonwebtoken");
 const route = express.Router();
 const bcrypt = require("bcrypt");
 const saltRounds = 10;
+const axios = require("axios");
+const queryString = require("query-string");
+
+function getLinkedInAuthorizationCode(codeLinkedIN) {
+  const params = {
+    grant_type: "authorization_code",
+    code: codeLinkedIN,
+    redirect_uri: "http://localhost:3000/profile",
+    client_id: process.env.EXPRESS_APP_CLIENT_ID,
+    client_secret: process.env.EXPRESS_APP_CLIENT_SECRET,
+  };
+  const query = queryString.stringify(params);
+  return axios.get(`https://www.linkedin.com/oauth/v2/accessToken?${query}`);
+}
+
+function getUserData(accessToken) {
+  return axios.get(`https://api.linkedin.com/v2/me`, {
+    headers: {
+      authorization: `Bearer ${accessToken}`,
+    },
+  });
+}
 
 route.get("/", verifyToken, (req, res) => {
   jwt.verify(req.token, "secretkey", (err, authData) => {
@@ -62,14 +84,25 @@ route.post("/register", (req, res) => {
   });
 });
 
-route.post("/api/posts", verifyToken, (req, res) => {
+route.get("/linkedInOauth/:code", verifyToken, (req, res) => {
+  const { code } = req.params;
   jwt.verify(req.token, process.env.JWT_KEY, (err, authData) => {
     if (err) {
       res.sendStatus(403);
     } else {
-      res.json({
-        authData,
-      });
+      getLinkedInAuthorizationCode(code)
+        .then((response) => {
+          if (response.status === 200) {
+            getUserData(response.data.access_token)
+              .then((response) => res.json(response.data))
+              .catch((err) => res.sendStatus(404));
+          }
+          // res.json({
+          //   authData,
+          //   response: response.data.access_token,
+          // });
+        })
+        .catch((err) => console.log(err));
     }
   });
 });
