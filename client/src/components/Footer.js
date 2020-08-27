@@ -6,7 +6,6 @@ const useFooterStyles = makeStyles((theme) => ({
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
-    // marginTop: "30vh",
     backgroundColor: "#3f51b5",
     color: "#fff",
     padding: theme.spacing(1),
