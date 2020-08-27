@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import queryString from "query-string";
-import { useLocation } from "react-router-dom";
+import { useLocation, useHistory } from "react-router-dom";
 import { Card, Typography, Button, makeStyles } from "@material-ui/core";
 
 function Head() {
@@ -110,6 +110,7 @@ function UserProfile() {
   const classes = useUserProfileStyles();
   const [userData, setUserData] = useState("");
   const linkedIncode = new URLSearchParams(location.search).get("code");
+  const history = useHistory();
 
   const LinkedIn = {
     response_type: "code",
@@ -119,7 +120,7 @@ function UserProfile() {
     scope: `r_liteprofile `,
   };
   const profileURL = queryString.stringify(LinkedIn);
-  const authURL = `${process.env.REACT_APP_LINKED_URI}${profileURL}`;
+  const authURL = `https://www.linkedin.com/oauth/v2/authorization/?${profileURL}`;
 
   const requestSever = async () => {
     const authToken = localStorage.getItem("token");
@@ -139,13 +140,14 @@ function UserProfile() {
       alert(error);
     }
   };
-  
+
   useEffect(() => {
     linkedIncode !== null && requestSever();
+    history.push('/profile');
   }, [linkedIncode]);
 
   console.log(userData);
-
+  
   return (
     <div className={classes.container}>
       <Typography variant="h6">Profile Page</Typography>
@@ -157,7 +159,6 @@ function UserProfile() {
       <Education />
       <Experience />
       <Skills />
-      {/* <Interests /> */}
     </div>
   );
 }

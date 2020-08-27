@@ -69,9 +69,9 @@ route.get("/", verifyToken, (req, res) => {
 route.get("/linkedInOauth/:code", verifyToken, async (req, res) => {
   const { code } = req.params;
   try {
-    const response = await getLinkedInAuthorizationCode(code);
+    let response = await getLinkedInAuthorizationCode(code);
     if (response.status === 200) {
-      const response = getLinkedInUserData(response.data.access_token);
+      response = await getLinkedInUserData(response.data.access_token);
       if (response.status === 200) {
         res.json(response.data);
         return;
@@ -79,6 +79,7 @@ route.get("/linkedInOauth/:code", verifyToken, async (req, res) => {
     }
     throw new Error();
   } catch (error) {
+    console.log(error);
     res.sendStatus(403);
   }
 });
