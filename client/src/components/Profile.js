@@ -7,21 +7,24 @@ import { Typography, makeStyles, Button } from "@material-ui/core";
 
 import Navbar from "./Navbar";
 import Footer from "./Footer";
+import UserProfile from "./UserProfile";
 
 const useUserProfileStyles = makeStyles((theme) => ({
   container: {
-    margin: "15px",
-    marginTop: "75px",
     display: "flex",
     flexDirection: "column",
-    justifyContent: "center",
+    // justifyContent: "center",
+    background: "#f5f5f5",
+    padding: theme.spacing(2),
+    height: "90vh",
+    marginTop: "55px",
   },
   main: {
     padding: "20px",
     display: "flex",
     flexDirection: "column",
     justifyContent: "center",
-    border: "1px solid black",
+    // border: "1px solid black",
     maxWidth: "100%",
   },
   button: {
@@ -70,19 +73,22 @@ function UserProfileDetails({ user }) {
 
   useEffect(() => {
     linkedIncode !== null && requestSever();
-  }, [])
+  }, []);
 
   return (
     <div className={classes.container}>
       <Typography variant="h6">Profile Page</Typography>
       <div className={classes.main}>
-        <Typography variant="body2">Email: {user.email}</Typography>
+        {/* <Typography variant="body2">Email: {user.email}</Typography>
         <Divider />
         <Typography variant="body2">User Name: {user.username}</Typography>
-        <Divider />
-        <a href={authURL}>LinkedIn</a>
-        <Divider />
-        <p>{JSON.stringify(userData)}</p>
+        <Divider /> */}
+        <Button variant="contained">
+          <a href={authURL}>LinkedIn</a>
+        </Button>
+        {/* <Divider /> */}
+        {/* <p>{JSON.stringify(userData)}</p> */}
+        <UserProfile />
       </div>
     </div>
   );

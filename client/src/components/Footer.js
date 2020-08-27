@@ -6,13 +6,14 @@ const useFooterStyles = makeStyles((theme) => ({
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
-    marginTop: "73vh",
+    // marginTop: "30vh",
     backgroundColor: "#3f51b5",
     color: "#fff",
+    padding: theme.spacing(1),
   },
-  text:{
-      fontSize:"18px"
-  }
+  text: {
+    fontSize: "24px",
+  },
 }));
 
 export default function Footer() {
