@@ -1,91 +1,8 @@
-import React from "react";
-import { makeStyles, Card, Typography } from "@material-ui/core";
-
-const profile = {
-  address: {
-    localized: {
-      en_US: "2029 Stierlin Ct, Mountain View, CA 94043",
-    },
-    preferredLocale: {
-      country: "US",
-      language: "en",
-    },
-  },
-  associations: {
-    localized: {
-      en_US: "2029 Stierlin Ct, Mountain View, CA 94043",
-    },
-    preferredLocale: {
-      country: "US",
-      language: "en",
-    },
-  },
-  backgroundImage: {
-    description: {
-      localized: {
-        en_US: "Description of the image",
-      },
-      preferredLocale: {
-        country: "US",
-        language: "en",
-      },
-    },
-    height: 720,
-    title: {
-      localized: {
-        en_US: "Title of the image",
-      },
-      preferredLocale: {
-        country: "US",
-        language: "en",
-      },
-    },
-    url: "https://linkedin.com",
-    width: 1080,
-  },
-  birthDate: {
-    birthDate: {
-      day: 1,
-      month: 1,
-      year: 1974,
-    },
-  },
-  certifications: {
-    id: "",
-    authority: "",
-    compnay: "",
-    endMonthYear: "",
-    licenseNumber: "",
-    name: "",
-    startMonthYear: "",
-    url: "",
-  },
-  contactInstructions: "",
-  courses: {
-    id: "",
-    name: {},
-    number: "",
-    occupation: "",
-  },
-  educations: "",
-  honors: "",
-  ims: "",
-  languages: "",
-  legacyHonors: "",
-  maritalStatus: "",
-  organizations: "",
-  patents: "",
-  phoneNumbers: "",
-  projects: "",
-  skills: "",
-  publications: "",
-  summaryRichMediaAssociations: "",
-  supportedLocales: "",
-  testScores: "",
-  volunteeringInterests: "",
-  websites: "",
-  volunteeringExperiences: "",
-};
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import queryString from "query-string";
+import { useLocation } from "react-router-dom";
+import { Card, Typography, Button, makeStyles } from "@material-ui/core";
 
 function Head() {
   return (
@@ -111,11 +28,11 @@ function About() {
   return (
     <Card style={{ margin: "20px 0px", padding: "20px" }}>
       <Typography variant="h6">About:</Typography>
-      <p>
+      <Typography variant="body1">
         A developer, geek, enthusiast, who loves to solve problems and fix
-        things with technology.I am working on 💻frontend web development with
-        Javascript and I love contributing to 🌟 open source.
-      </p>
+        things with technology.I am working on frontend web development with
+        Javascript and I love contributing to open source.
+      </Typography>
     </Card>
   );
 }
@@ -140,15 +57,11 @@ function Experience() {
   return (
     <Card style={{ margin: "20px 0px", padding: "20px" }}>
       <Typography variant="h6">Experience:</Typography>
-      <p>Technical Lead</p>
+      <Typography variant="body1">Technical Lead</Typography>
       <p>Company Name: Rave Cyber Solutions Pvt Ltd Full-time</p>
-      <p>
-        Dates Employed : Apr 2020 – Aug 2020
-        <p>
-          Employment Duration: 5 mos
-          <p>Location:Hyderabad,Telangana, India</p>
-        </p>
-      </p>
+      <p>Dates Employed : Apr 2020 – Aug 2020</p>
+      <p>Employment Duration: 5 mos</p>
+      <p>Location:Hyderabad,Telangana, India</p>
     </Card>
   );
 }
@@ -158,24 +71,87 @@ function Skills() {
   return (
     <Card style={{ margin: "20px 0px", padding: "20px" }}>
       <Typography variant="h6">Skills:</Typography>
-      <p>Python,Javascript,HTML,CSS and reactjs</p>
+      <Typography variant="body1">
+        Python,Javascript,HTML,CSS and Reactjs
+      </Typography>
     </Card>
   );
 }
 
 //Interests
 
-function Interests() {
-  return (
-    <Card style={{ margin: "20px 0px", padding: "20px" }}>
-      <Typography variant="h6">Interests:</Typography>
-    </Card>
-  );
-}
+// function Interests() {
+//   return (
+//     <Card style={{ margin: "20px 0px", padding: "20px" }}>
+//       <Typography variant="h6">Interests:</Typography>
+//     </Card>
+//   );
+// }
+const useUserProfileStyles = makeStyles((theme) => ({
+  container: {
+    display: "flex",
+    flexDirection: "column",
+    background: "#f5f5f5",
+    padding: theme.spacing(2),
+    // height: "90vh",
+    marginTop: "55px",
+  },
+  main: {
+    padding: "20px",
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "center",
+    maxWidth: "100%",
+  },
+}));
 
 function UserProfile() {
+  let location = useLocation();
+  const classes = useUserProfileStyles();
+  const [userData, setUserData] = useState("");
+  const linkedIncode = new URLSearchParams(location.search).get("code");
+
+  const LinkedIn = {
+    response_type: "code",
+    client_id: `${process.env.REACT_APP_CLIENT_ID}`,
+    redirect_uri: `${process.env.REACT_APP_REDIRECT_URI}`,
+    state: "DCEeFWf45A53sdfKef424",
+    scope: `r_liteprofile `,
+  };
+  const profileURL = queryString.stringify(LinkedIn);
+  const authURL = `${process.env.REACT_APP_LINKED_URI}${profileURL}`;
+
+  const requestSever = async () => {
+    const authToken = localStorage.getItem("token");
+    try {
+      const response = await axios.get(
+        `${process.env.REACT_APP_BACKEND_API}/linkedInOauth/${linkedIncode}`,
+        {
+          headers: {
+            authorization: `Bearer ${authToken}`,
+          },
+        }
+      );
+      if (response.status === 200) {
+        setUserData(response.data);
+      }
+    } catch (error) {
+      alert(error);
+    }
+  };
+  
+  useEffect(() => {
+    linkedIncode !== null && requestSever();
+  }, [linkedIncode]);
+
+  console.log(userData);
+
   return (
-    <div>
+    <div className={classes.container}>
+      <Typography variant="h6">Profile Page</Typography>
+      <Button variant="contained">
+        <a href={authURL}>LinkedIn</a>
+      </Button>
       <Head />
       <About />
       <Education />

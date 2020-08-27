@@ -32,6 +32,9 @@ const useLoginStyles = makeStyles((theme) => ({
       display: "none",
     },
   },
+  link: {
+    marginTop: "20px",
+  },
 }));
 
 export default function Login() {
@@ -68,7 +71,12 @@ export default function Login() {
   return (
     <form onSubmit={(e) => handleSubmit(e)}>
       <div className={classes.container}>
-        <img src={login} style={{ width: "500px" }} className={classes.image} alt="login logo"/>
+        <img
+          src={login}
+          style={{ width: "500px" }}
+          className={classes.image}
+          alt="login logo"
+        />
         <div className={classes.main}>
           <Typography variant="h6">User Login</Typography>
           <TextField
@@ -92,7 +100,7 @@ export default function Login() {
           <Button variant="contained" color="primary" type="submit">
             Login
           </Button>
-          <a href="/">
+          <a href="/" className={classes.link}>
             <p> Don't have an account? Register </p>
           </a>
         </div>
