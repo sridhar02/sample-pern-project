@@ -18,8 +18,8 @@ const useFooterStyles = makeStyles((theme) => ({
 export default function Footer() {
   const classes = useFooterStyles();
   return (
-    <div className={classes.container}>
+    <Footer className={classes.container}>
       <p className={classes.text}>© 2020 Alumini company</p>
-    </div>
+    </Footer>
   );
 }

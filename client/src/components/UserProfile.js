@@ -116,10 +116,10 @@ const useUserProfileStyles = makeStyles((theme) => ({
 }));
 
 function UserProfile() {
-  let location = useLocation();
-  const classes = useUserProfileStyles();
-  const [userData, setUserData] = useState("");
   const [showProfile, setShowProfile] = useState(false);
+  let location = useLocation();
+  const classes = useUserProfileStyles(showProfile);
+  const [userData, setUserData] = useState("");
   const linkedIncode = new URLSearchParams(location.search).get("code");
   const history = useHistory();
 
@@ -173,7 +173,7 @@ function UserProfile() {
       {showProfile && (
         <div
           style={{
-            margin:"0px 50vh"
+            // margin: "0px 50vh",
           }}
         >
           <Head />
